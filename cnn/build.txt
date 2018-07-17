@@ -1,0 +1,9 @@
+g++ yolov3.cpp  cnn/*.cpp cnn/layers/*.cpp -I. -o main -lopencv_core -lopencv_highgui -lopencv_imgproc -std=c++11 -Wno-unused-result -Ofast -ffast-math
+
+
+
+
+
+g++ yolov2.cpp  cnn/*.cpp cnn/layers/*.cpp -I. -lopencv_core -lopencv_highgui -lopencv_imgproc -std=c++11 -Wno-unused-result -Ofast -ffast-math -o yolov2
+
+
