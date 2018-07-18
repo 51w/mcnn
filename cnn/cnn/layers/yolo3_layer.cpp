@@ -147,6 +147,8 @@ box get_yolo_box(float *x, int *biases, int n, int index, int i, int j, int lw, 
 
 void Yolo3Layer::Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top)
 {	
+	//fprintf(stderr, "********************%f  %f  %d %d\n", _thresh,  this->_NetThresh, this->NetH, this->NetW);
+
 	Dtype* bottom_data = bottom[0]->mutable_cpu_data();
 	
 	int ccc = _classes+4+1;
@@ -253,6 +255,7 @@ void Yolo3Layer::Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& t
 			output[i] = result[i];
 		}
 	}
+
 }
 
 REGISTER_LAYER_CLASS(Yolo3);

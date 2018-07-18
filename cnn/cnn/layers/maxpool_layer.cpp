@@ -24,6 +24,7 @@ void MaxpoolLayer::LayerSetUp(const vector<Blob*>& bottom, const vector<Blob*>& 
 
 void MaxpoolLayer::Forward_cpu(const vector<Blob*>& bot, const vector<Blob*>& top)
 {
+	//fprintf(stderr, "@@@@@@@@@@@@@@@@%f  %d %d\n", this->_NetThresh, this->NetH, this->NetW);
 	//fprintf(stderr, "Maxpl: %d %d %d\n", _kernel, _stride, _pad);
 	
 	const float* src = bot[0]->cpu_data();

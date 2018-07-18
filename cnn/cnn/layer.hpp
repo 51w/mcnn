@@ -31,6 +31,9 @@ public:
 //protected:
 	vector<string> layer_param_;
 	vector<shared_ptr<Blob> > blobs_;
+	int NetH = 0;
+	int NetW = 0;
+	float _NetThresh = 0;
 	
 	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top) = 0;
 	

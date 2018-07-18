@@ -12,6 +12,36 @@ struct Object{
     float prob;
 };
 
+void correct_boxes(float *out, int size, int w, int h, int netw, int neth)
+{
+	int new_w = 0;
+    int new_h = 0;
+	
+	// int netw = 416;
+	// int neth = 416;
+	
+	// int w = img.cols;
+	// int h = img.rows;
+	
+    if(((float)netw/w) < ((float)neth/h)) 
+	{
+        new_w = netw;
+        new_h = (h * netw)/w;
+    }else{
+        new_h = neth;
+        new_w = (w * neth)/h;
+    }
+	
+	for(int i=0; i<size; i+=6)
+	{
+		
+		out[i+2] = (out[i+2] - (netw - new_w)/2./netw) / ((float)new_w/netw); 
+		out[i+3] = (out[i+3] - (neth - new_h)/2./neth) / ((float)new_h/neth);
+		out[i+4] *= (float)netw/new_w;
+		out[i+5] *= (float)neth/new_h;
+	}
+}
+
 int main(int argc, char** argv)
 {
 	cnn::Net yolov3;
@@ -34,14 +64,15 @@ int main(int argc, char** argv)
 		in[i] = input.data[i];
 	
 	
-	yolov3.Forward();
-	
+	yolov3.forward();
 	
 	std::vector<Object> objects;
 	shared_ptr<cnn::Blob> prob = yolov3.blob_by_name("prob2");
 	if(prob->count()==0) return 0;
 	float *out = prob->mutable_cpu_data();
-//fprintf(stderr, "Yolo3 @4\n");		
+
+	//correct_boxes(out, prob->count(), img.cols, img.rows, 416, 416);
+	
 	int new_w = 0;
     int new_h = 0;
 	
@@ -94,7 +125,7 @@ int main(int argc, char** argv)
     {
 		Object object = objects.at(i);
 		
-		cv::rectangle(img, object.rec, cv::Scalar(0, 255, 0), 3);
+		cv::rectangle(img, object.rec, cv::Scalar(0, 0, 255), 8);
 	}
 	
 	

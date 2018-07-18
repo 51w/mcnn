@@ -52,7 +52,7 @@ const Dtype* Blob::cpu_data() const
 {
 	if(!(data_))
 	{
-		fprintf(stderr, "mutable_cpu_data failed!\n");
+		fprintf(stderr, "cpu_data failed!\n");
 		exit(0);
 	}
 	return (const Dtype*)data_->cpu_data();

@@ -1,7 +1,6 @@
 #include "cnn/layers/input_layer.hpp"
 
-namespace cnn 
-{
+namespace cnn {
 
 void InputLayer::LayerSetUp(const vector<Blob*>& bottom, const vector<Blob*>& top) 
 {
@@ -17,5 +16,4 @@ void InputLayer::LayerSetUp(const vector<Blob*>& bottom, const vector<Blob*>& to
 }
 
 REGISTER_LAYER_CLASS(Input);
-
 }

@@ -1,8 +1,7 @@
 #pragma once
 #include "cnn/layer.hpp"
 
-namespace cnn
-{
+namespace cnn{
 
 class InputLayer : public Layer
 {
@@ -16,8 +15,7 @@ public:
 	virtual void LayerSetUp( const vector<Blob*>& bottom, const vector<Blob*>& top);
 
 	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top)
-	{	}
+	{ }
 	
 };
-
 }

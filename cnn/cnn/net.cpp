@@ -126,6 +126,13 @@ int Net::load_param(FILE* fp)
 		layer_names_index_[layer_names_[layer_id]] = layer_id;
 	}
 	
+	// malloc 
+	//for(int i=0; i<blobs_.size(); i++)
+	//{
+	//	shared_ptr<Blob> blob = blobs_[i];
+	//	blob->mutable_cpu_data();
+	//}
+	
     return 0;
 }
 
@@ -241,7 +248,7 @@ void Net::SetParam(string paramstr)
 	_param.push_back(setparam);
 }
 
-void Net::Forward() 
+void Net::forward() 
 {
 	for (int i = 0; i < layers_.size(); ++i) 
 	{

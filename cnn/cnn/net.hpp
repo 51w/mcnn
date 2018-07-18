@@ -19,7 +19,7 @@ public:
   
 	void SetParam(string paramstr);
 	
-	void Forward(); //compute
+	void forward(); //compute
 	
 	bool has_blob(const string& blob_name) const;
 	const shared_ptr<Blob> blob_by_name(const string& blob_name) const;

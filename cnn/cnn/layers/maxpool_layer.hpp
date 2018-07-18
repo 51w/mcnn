@@ -1,8 +1,7 @@
 #pragma once
 #include "cnn/layer.hpp"
 
-namespace cnn 
-{
+namespace cnn {
 
 class MaxpoolLayer : public Layer
 {
@@ -14,7 +13,7 @@ public:
 	virtual inline const char* type() const 
 	{ return "Maxpool"; }
 	
-	virtual void LayerSetUp( const vector<Blob*>& bottom, const vector<Blob*>& top);	
+	virtual void LayerSetUp( const vector<Blob*>& bottom, const vector<Blob*>& top);
 	
 	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top);
 
@@ -26,7 +25,5 @@ protected:
 	int XC, YC;
 	int XH, YH;
 	int XW, YW;
-	
 };
-
 }

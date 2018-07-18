@@ -31,6 +31,8 @@ protected:
 	int  _activation;
 	bool _normalize;
 	
+	Blob _im2col;
+	
 	int XC, YC;
 	int XH, YH;
 	int XW, YW;	
