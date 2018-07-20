@@ -5,6 +5,7 @@ namespace H2O {
 
 class SplitLayer : public Layer
 {
+	
 public:
 	explicit SplitLayer(const vector<string>& param) 
 		: Layer(param) {}
@@ -15,6 +16,11 @@ public:
 	virtual void LayerSetUp( const vector<Blob*>& bottom, const vector<Blob*>& top);
 		
 	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top);
-	
+
+protected:
+	int CC;
+	int HH;
+	int WW;
+
 };
 }

@@ -15,17 +15,20 @@ public:
 	
 	virtual ~Layer() {}
 
+	virtual inline const char* type() const 
+	{  return "";  }
+	
 	void SetUp(const vector<Blob*>& bottom, const vector<Blob*>& top) 
-	{
-		LayerSetUp(bottom, top);
-	}
+	{  LayerSetUp(bottom, top);  }
 
 	virtual void LayerSetUp(const vector<Blob*>& bottom, const vector<Blob*>& top) {}
-	inline void Forward(const vector<Blob*>& bottom, const vector<Blob*>& top);
 	
+	inline  void Forward(const vector<Blob*>& bottom, const vector<Blob*>& top);
+	
+	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top) = 0;
 
-	virtual inline const char* type() const { return ""; }
-
+	
+	virtual int Get_YoloParam() {}
 
 //protected:
 	vector<string> layer_param_;
@@ -34,10 +37,7 @@ public:
 	int NetW = 0;
 	float _NetThresh = 0;
 	
-	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top) = 0;
-	
 };
-
 
 inline void Layer::Forward(const vector<Blob*>& bottom, const vector<Blob*>& top)
 {

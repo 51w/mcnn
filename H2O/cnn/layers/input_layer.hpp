@@ -22,6 +22,6 @@ protected:
 	int YC;
 	int YH;
 	int YW;	
-	
+
 };
 }

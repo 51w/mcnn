@@ -11,9 +11,9 @@ void Yolo3Layer::LayerSetUp(const vector<Blob*>& bottom, const vector<Blob*>& to
 	_mask[1] = stoi(this->layer_param_[1]);
 	_mask[2] = stoi(this->layer_param_[2]);
 	
-	_classes = stoi(this->layer_param_[3]);
-	_thresh  = stof(this->layer_param_[4]);
-	_num	 = 3;
+	_num     = stof(this->layer_param_[3]);
+	_classes = stoi(this->layer_param_[4]);
+	_thresh  = stof(this->layer_param_[5]);
 	
 	int anchors[12] = {10,14, 23,27, 37,58, 81,82, 135,169, 344,319};
 	for(int i=0; i<12; i++) _anchors[i] = anchors[i];	
@@ -53,21 +53,6 @@ box get_region_box3(float *x, int *biases, int n, int index, int i, int j, int w
     return b;
 }
 
-int nms_comparator3(const void *pa, const void *pb)
-{
-    Detection a = *(Detection *)pa;
-    Detection b = *(Detection *)pb;
-    float diff = 0;
-    if(b.sort_class >= 0){
-        diff = a.prob[b.sort_class] - b.prob[b.sort_class];
-    } else {
-        diff = a.objectness - b.objectness;
-    }
-    if(diff < 0) return 1;
-    else if(diff > 0) return -1;
-    return 0;
-}
-
 float overlap3(float x1, float w1, float x2, float w2)
 {
     float l1 = x1 - w1/2;
@@ -100,6 +85,21 @@ float box_iou3(box a, box b)
     return box_intersection3(a, b)/box_union3(a, b);
 }
 
+int nms_comparator3(const void *pa, const void *pb)
+{
+    Detection a = *(Detection *)pa;
+    Detection b = *(Detection *)pb;
+    float diff = 0;
+    if(b.sort_class >= 0){
+        diff = a.prob[b.sort_class] - b.prob[b.sort_class];
+    } else {
+        diff = a.objectness - b.objectness;
+    }
+    if(diff < 0) return 1;
+    else if(diff > 0) return -1;
+    return 0;
+}
+
 void do_nms_sort3(Detection *dets, int total, int classes, float thresh)
 {
     int i, j, k;
@@ -114,6 +114,7 @@ void do_nms_sort3(Detection *dets, int total, int classes, float thresh)
         }
     }
     total = k+1;
+	//fprintf(stderr, ">>>>>>>>>>%d \n", total);
 
     for(k = 0; k < classes; ++k){
         for(i = 0; i < total; ++i){
@@ -143,120 +144,97 @@ box get_yolo_box(float *x, int *biases, int n, int index, int i, int j, int lw, 
     return b;
 }
 
+
+int Yolo_Box(float *box, float *x, int *biases, int n, int index, 
+				int i, int j, int lw, int lh, int w, int h, int stride)
+{
+    box[0] = (i + x[index + 0*stride]) / lw;
+    box[1] = (j + x[index + 1*stride]) / lh;
+    box[2] = exp( x[index + 2*stride]) * biases[2*n]   / w;
+    box[3] = exp( x[index + 3*stride]) * biases[2*n+1] / h;
+	
+    return 0;
+}
+
 void Yolo3Layer::Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top)
 {	
-	//fprintf(stderr, "********************%f  %f  %d %d\n", _thresh,  this->_NetThresh, this->NetH, this->NetW);
-
-	Dtype* bottom_data = bottom[0]->mutable_cpu_data();
+	float* bottom_data = bottom[0]->mutable_cpu_data();
 	
 	int ccc = _classes+4+1;
-	int w = bottom[0]->width();
-	int h = bottom[0]->height();
-	int _outputs = w*h*_num*ccc;
+	int YW = bottom[0]->WW();
+	int YH = bottom[0]->HH();
+	int size = YW*YH;
 	
 	for(int n = 0; n < _num; ++n)
 	{
-		for(int i = 0; i < w*h; ++i)
+	 for(int i = 0; i < size; ++i)
+	 {
+		int index = n*size*ccc + i;
+		Dtype x = bottom_data[index];
+		bottom_data[index] = logistic_activate3(x);
+		
+		index = (n*ccc + 1)*size + i;
+		x = bottom_data[index];
+		bottom_data[index] = logistic_activate3(x);
+		
+		
+		for(int j=0; j<_classes+1; j++)
 		{
-			int index = n*w*h*ccc + i;
-			Dtype x = bottom_data[index];
-			bottom_data[index] = logistic_activate3(x);
-			
-			index = (n*ccc + 1)*w*h + i;
+			index = (n*ccc + 4)*size + i*(_classes+1) + j;
 			x = bottom_data[index];
 			bottom_data[index] = logistic_activate3(x);
-			
-			
-			for(int j=0; j<_classes+1; j++)
-			{
-				index = (n*ccc + 4)*w*h + i*(_classes+1) + j;
-				x = bottom_data[index];
-				bottom_data[index] = logistic_activate3(x);
-			}
 		}
+	 }
 	}
 	
-	//detection result
-	int _numbox = _num*w*h;
-	Detection *_box = (Detection *)calloc(_numbox, sizeof(Detection));
-	for(int i = 0; i < _num*w*h; ++i){
-        _box[i].prob = (float *)calloc(_classes, sizeof(float));
-    }
-	
-	int count = 0;
-	float *predictions = bottom_data;	
-	for(int i = 0; i < w*h; ++i)
+	// output
+	vector<float> Yolo3;
+	for(int i = 0; i < YH; i++)
 	{
-        int row = i / w;
-        int col = i % w;
-        for(int n = 0; n < _num; ++n)
+	 for(int j = 0; j < YW; j++)
+	 {
+		int index = i*YW + j;
+		for(int n = 0; n < _num; n++)
 		{
-			int obj_index  = n*w*h*(4+_classes+1) + 4*w*h + i;
-			float objectness = predictions[obj_index];
-            if(objectness <= _thresh) continue;
+			int   obj_index  = n*size*(4+_classes+1) + 4*size + index;
+			float objectness = bottom_data[obj_index];
+			if(objectness <= _thresh) continue;
 			
-			int box_index  = n*w*h*(4+_classes+1) + i;	
-            //_box[count].bbox = get_region_box3(predictions, _anchors, n, box_index, col, row, w, h, w*h);
-            _box[count].bbox = get_yolo_box(predictions, _anchors, _mask[n], box_index, col, row, w, h, 416, 416, w*h);
-			_box[count].objectness = objectness;
-			_box[count].classes = _classes;
+			int box_index  = n*size*(4+_classes+1) + index;
+			float rec[4];
+			Yolo_Box(rec, bottom_data, _anchors, _mask[n], box_index, j, i, YW, YH, 416, 416, size);
+			//fprintf(stderr, "@@@  %f %f %f %f\n", rec[0], rec[1], rec[2], rec[3]);
 			
-			//fprintf(stderr, "_mask %d\n", _mask[n]);
+			Yolo3.push_back(rec[0]);
+			Yolo3.push_back(rec[1]);
+			Yolo3.push_back(rec[2]);
+			Yolo3.push_back(rec[3]);		
+			//Yolo3.push_back(objectness);
 			
-			int class_inx = n*w*h*(4+_classes+1) + 5*w*h + i;
+			int class_inx = n*size*(4+_classes+1) + 5*size + index;
 			for(int j = 0; j < _classes; ++j)
 			{
-				int class_index = class_inx + j*w*h;
-				float prob = objectness*predictions[class_index];
-				_box[count].prob[j] = (prob > _thresh) ? prob : 0;
-			}
-			++count;
-		}
-	}
-	
-	float _NSMthresh = 0.45;
-	if(_NSMthresh) 
-	do_nms_sort3(_box, _numbox, _classes, _NSMthresh);
-
-	vector<float> result;
-	for(int m = 0; m < _numbox; ++m)
-	{
-		int idclass = -1;
-		for(int n = 0; n < _classes; ++n)
-		{
-			if (_box[m].prob[n] > _thresh)
-			{
-				if(idclass < 0) idclass = n;
-			   //fprintf(stderr, "classes %d  %d\n", i, n);
-			   printf("%d  %.0f%%\n", n, _box[m].prob[n]*100);
+				int class_index = class_inx + j*size;
+				float prob = objectness*bottom_data[class_index];
+				float pp = (prob > _thresh) ? prob : 0;
+				
+				Yolo3.push_back(pp);
 			}
 		}
-		if(idclass >= 0)
-		{
-			box b = _box[m].bbox;
-			fprintf(stderr, "###%f %f %f %f\n", b.x, b.y, b.w, b.h);
-			result.push_back(idclass);
-			result.push_back(_box[m].prob[idclass]);
-			result.push_back(b.x);
-			result.push_back(b.y);
-			result.push_back(b.w);
-			result.push_back(b.h);
-		}
+	 }
 	}
+	fprintf(stderr, "Yolo3.size %ld\n", Yolo3.size());
 	
 	top[0]->Reshape(0);
-	
-	//fprintf(stderr, ">>>size %ld\n", result.size());
-	if(result.size()>0)
+	if(Yolo3.size()>0)
 	{
-		top[0]->Reshape(result.size());
+		top[0]->Reshape(Yolo3.size());
 		float *output = top[0]->mutable_cpu_data();
 		for(int i=0; i<top[0]->count(); i++)
 		{
-			output[i] = result[i];
+			output[i] = Yolo3[i];
 		}
 	}
-
 }
 
 REGISTER_LAYER_CLASS(Yolo3);

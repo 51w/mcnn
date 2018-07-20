@@ -17,11 +17,11 @@ Convolution      conv7            1 1 pool6 conv7 0=1   1=1024 2=3 3=1 4=1 5=1
 Convolution      conv8            1 1 conv7 conv8 0=1   1=256  2=1 3=1 4=1 5=1
 Convolution      conv9            1 1 conv8 conv9 0=1   1=512  2=3 3=1 4=1 5=1
 Convolution      convA            1 1 conv9 convA 0=0   1=255  2=1 3=1 4=1 5=0
-Yolo3            prob1            1 1 convA prob1 0=3 1=4 2=5 3=80 4=0.3
+Yolo3            prob1            1 1 convA prob1 0=3 1=4 2=5 3=3 4=80 5=0.5
 Route			 rout1			  1 1 conv8 rout1 
 Convolution      convB            1 1 rout1 convB 0=1   1=128  2=1 3=1 4=1 5=1
 Upsample		 upsample		  1 1 convB up1	  0=2 
 Route			 rout2			  2 1 up1 conv5 rout2  
 Convolution      convC            1 1 rout2 convC 0=1   1=256  2=3 3=1 4=1 5=1
 Convolution      convD            1 1 convC convD 0=0   1=255  2=1 3=1 4=1 5=0
-Yolo3            prob2            1 1 convD prob2 0=1 1=2 2=3 3=80 4=0.3
+Yolo3            prob2            1 1 convD prob2 0=1 1=2 2=3 3=3 4=80 5=0.5

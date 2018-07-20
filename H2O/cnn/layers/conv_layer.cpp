@@ -25,13 +25,13 @@ void ConvolutionLayer::LayerSetUp(const vector<Blob*>& bottom, const vector<Blob
 	{
 		this->blobs_.resize(2);
 	}
-	this->blobs_[0].reset(new Blob(bottom[0]->channels()*_kernel*_kernel*_filters));
+	this->blobs_[0].reset(new Blob(bottom[0]->CC()*_kernel*_kernel*_filters));
 	this->blobs_[1].reset(new Blob(_filters));
 	
 	
-	XC = bottom[0]->channels();
-	XH = bottom[0]->height();
-	XW = bottom[0]->width();
+	XC = bottom[0]->CC();
+	XH = bottom[0]->HH();
+	XW = bottom[0]->WW();
 	
 	YH = (XH + 2*_pad - _kernel) / _stride + 1;
 	YW = (XW + 2*_pad - _kernel) / _stride + 1;
@@ -261,7 +261,7 @@ void ConvolutionLayer::bias_inplace(Blob& bottom)
 	float *data = bottom.mutable_cpu_data();
 	float *_biases = this->blobs_[1]->mutable_cpu_data();
 	
-	for (int q=0; q<bottom.channels(); q++)
+	for (int q=0; q<bottom.CC(); q++)
     {
         float* ptr = data + q*bottom.offset(1);
 
@@ -279,7 +279,7 @@ void ConvolutionLayer::scale_inplace(Blob& bottom)
 	float *data = bottom.mutable_cpu_data();
 	float *_scales = this->blobs_[2]->mutable_cpu_data();
 	
-	for (int q=0; q<bottom.channels(); q++)
+	for (int q=0; q<bottom.CC(); q++)
     {
         float* ptr = data + q*bottom.offset(1);
 
@@ -298,7 +298,7 @@ void ConvolutionLayer::normalize_inplace(Blob& bottom)
 	float *_rolling_mean = this->blobs_[3]->mutable_cpu_data();
 	float *_rolling_variance = this->blobs_[4]->mutable_cpu_data();
 	
-	for (int q=0; q<bottom.channels(); q++)
+	for (int q=0; q<bottom.CC(); q++)
     {
         float* ptr = data + q*bottom.offset(1);
 

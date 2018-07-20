@@ -129,7 +129,7 @@ int Net::load_param(FILE* fp)
 	for(int i=0; i<blobs_.size(); i++)
 	{
 		shared_ptr<Blob> blob = blobs_[i];
-		if(blob->count()>0)		blob->mutable_cpu_data();
+		if(blob->count()>0)	 blob->mutable_cpu_data();
 	}
 	
     return 0;

@@ -5,6 +5,7 @@ namespace H2O {
 
 class UpsampleLayer : public Layer
 {
+
 public:
 	explicit UpsampleLayer(const vector<string>& param) 
 		: Layer(param) {}
@@ -16,11 +17,12 @@ public:
 	
 	virtual void Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& top);
 	
-protected:	
+protected:
+	int _stride;
+	
 	int XC, YC;
 	int XH, YH;
 	int XW, YW;
-	
-	int _stride;
+
 };
 }

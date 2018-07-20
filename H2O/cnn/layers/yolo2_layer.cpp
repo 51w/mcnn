@@ -147,8 +147,8 @@ void Yolo2Layer::Forward_cpu(const vector<Blob*>& bottom, const vector<Blob*>& t
 	//Dtype* top_data = top[0]->mutable_cpu_data();
 	
 	int ccc = _classes+_coords+1; //80+4+1
-	int w = bottom[0]->width();
-	int h = bottom[0]->height();
+	int w = bottom[0]->WW();
+	int h = bottom[0]->HH();
 	int _outputs = w*h*_num*ccc;
 	
 	for(int n = 0; n < _num; ++n)

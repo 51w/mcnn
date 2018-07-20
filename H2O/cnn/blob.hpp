@@ -67,9 +67,9 @@ public:
 	}
 
 	// num channels height width
-	inline int channels() const { return LegacyShape(0); }
-	inline int height() const { return LegacyShape(1); }
-	inline int width() const { return LegacyShape(2); }
+	inline int CC() const { return LegacyShape(0); }
+	inline int HH() const { return LegacyShape(1); }
+	inline int WW() const { return LegacyShape(2); }
 	inline int LegacyShape(int index) const 
 	{
 		if (index >= num_axes() || index < -num_axes()) 
@@ -82,7 +82,7 @@ public:
 	inline int offset(const int c = 0, const int h = 0,
 		const int w = 0) const 
 	{
-		return (c * height() + h) * width() + w;
+		return (c * HH() + h) * WW() + w;
 	}
 
 

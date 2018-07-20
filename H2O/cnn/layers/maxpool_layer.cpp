@@ -9,23 +9,19 @@ void MaxpoolLayer::LayerSetUp(const vector<Blob*>& bottom, const vector<Blob*>& 
 	_stride = stoi(this->layer_param_[1]);
 	_pad    = stoi(this->layer_param_[2]);
 	
-	XC = bottom[0]->channels();
-	XH = bottom[0]->height();
-	XW = bottom[0]->width();
+	XC = bottom[0]->CC();
+	XH = bottom[0]->HH();
+	XW = bottom[0]->WW();
 	
 	YH = (XH + 2*_pad) / _stride;
 	YW = (XW + 2*_pad) / _stride;
 	YC = XC;
 	
 	top[0]->Reshape(YC, YH, YW);
-	//fprintf(stderr, "Maxpl: %d %d %d\n", top[0]->channels(), top[0]->height(), top[0]->width());
 }
 
 void MaxpoolLayer::Forward_cpu(const vector<Blob*>& bot, const vector<Blob*>& top)
 {
-	//fprintf(stderr, "@@@@@@@@@@@@@@@@%f  %d %d\n", this->_NetThresh, this->NetH, this->NetW);
-	//fprintf(stderr, "Maxpl: %d %d %d\n", _kernel, _stride, _pad);
-	
 	const float* src = bot[0]->cpu_data();
 	float* dst = top[0]->mutable_cpu_data();
 	
