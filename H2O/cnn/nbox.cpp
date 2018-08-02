@@ -184,7 +184,8 @@ image Exchange_ncnnMat(int Yw, int Yh, int Yc, unsigned char *inptr)
 
 //Debug
 //FILE* pp = fopen("image111.txt", "wb");
-//for(int i=0; i<input.w * input.h * input.c; i++){
-//	fprintf(pp, "%f  v05\n", input.data[i]);
+//for(int i=0; i<input.w * input.h * input.c; i++)
+//{
+//	fprintf(pp, "%f \n", input.data[i]);
 //}
 //fclose(pp);

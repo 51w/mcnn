@@ -87,8 +87,8 @@ int main(int argc, char** argv)
 	H2O::Net yolov3;
     //yolov3.load_param("yolov3-tiny.param");
     //yolov3.load_model("yolov3-tiny.weights");
-	yolov3.load_param("V_5000.param");
-    yolov3.load_model("V_5000.bin");
+	yolov3.load_param("V10000.param");
+    yolov3.load_model("v7200.bin");
 
 	
 
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
        // return -1;
     // }
 	int _classN = 1;
-	int _thresh = 0.1;
+	int _thresh = 0.2;
 	
 	cv::namedWindow("result", 0);
 	
