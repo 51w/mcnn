@@ -24,12 +24,16 @@ public:
 	void SetParam(string paramstr);
 	
 	void Run(); //compute
+
+public:
+	int _NH, _NW, _NC;
+	int   _Nclass;  //Yolo-v3
+	float _Nthresh; //Yolo-v3
 	
-	
-public:	
 	vector<Blob*> net_input_blobs_;
 	vector<Blob*> net_output_blobs_;	
-	
+
+protected:	
 	vector<shared_ptr<Layer> > layers_;
 	vector<shared_ptr<Blob> > blobs_;
 

@@ -19,6 +19,17 @@ void Yolo3Layer::SetUp(const vector<Blob*>& bottom, const vector<Blob*>& top)
 	for(int i=0; i<12; i++) _anchors[i] = anchors[i];	
 }
 
+void Yolo3Layer::L2Net(Net *net)
+{
+	_netH = net->_NH;
+	_netW = net->_NW;
+	
+	net->_Nclass = _classes;
+	net->_Nthresh = _thresh;
+	
+	LOG(INFO) << _netH << "X" << _netW << "   " << net->_Nclass << " " << net->_Nthresh;
+}
+
 float logistic_activate3(float x) 
 { 
 	return 1.F / (1.F + exp(-x)); 
@@ -81,7 +92,7 @@ void Yolo3Layer::Run(const vector<Blob*>& bottom, const vector<Blob*>& top)
 			
 			int box_index  = n*size*(4+_classes+1) + index;
 			float rec[4];
-			Yolo_Box(rec, bottom_data, _anchors, _mask[n], box_index, j, i, YW, YH, 416, 416, size);
+			Yolo_Box(rec, bottom_data, _anchors, _mask[n], box_index, j, i, YW, YH, _netH, _netW, size);
 			//fprintf(stderr, "@@@  %f %f %f %f\n", rec[0], rec[1], rec[2], rec[3]);
 			
 			Yolo3.push_back(rec[0]);
@@ -102,7 +113,7 @@ void Yolo3Layer::Run(const vector<Blob*>& bottom, const vector<Blob*>& top)
 		}
 	 }
 	}
-	fprintf(stderr, "Yolo3.size %ld\n", Yolo3.size());
+	//fprintf(stderr, "Yolo3.size %ld\n", Yolo3.size());
 	
 	top[0]->Reshape(0);
 	if(Yolo3.size()>0)

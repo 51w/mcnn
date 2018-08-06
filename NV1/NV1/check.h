@@ -6,6 +6,8 @@
 #include <iostream>
 
 namespace NV1{
+	
+	
 #define LOG_ERROR 		LOG_INFO
 #define LOG_WARNING 	LOG_INFO
 #define LOG(severity) 	LOG_##severity.stream()
@@ -20,6 +22,7 @@ NV1::LogMessageFatal(__FILE__, __LINE__).stream() << "Check Failed: " #x << ' '\
 #define CHECK_NOTNULL(x) \
 ((x) == NULL ? caffe::LogMessageFatal(__FILE__, __LINE__).stream() 	\
 << "Check  notnull: "  #x << ' ', (x) : (x)) 						\
+
 
 
 //***********************************************//	  

@@ -8,6 +8,8 @@ class InputLayer : public Layer
 	
 public:
 	REGISTER_LAYER_INIT(Input);
+	
+	virtual void L2Net(Net *net);
 
 protected:
 	int YC;

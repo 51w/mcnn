@@ -78,7 +78,7 @@ int Net::ncnn_param(const char* protopath)
 		
 		// Layers create
 		layers_.push_back(LayerRegistry::CreateLayer(layer_name, layer_type, _param[layer_id]));
-		layers_[layer_id]->SetUp(bottom_vecs_[layer_id], top_vecs_[layer_id]);
+		layers_[layer_id]->xSetUp(bottom_vecs_[layer_id], top_vecs_[layer_id], this);
 		
 		layer_id++;
 	}
@@ -152,7 +152,6 @@ int Net::number_param()
 			available_blobs.insert(blob_name);
 		}
 	}
-	
 	
 	return 0;
 }

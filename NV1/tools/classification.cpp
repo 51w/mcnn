@@ -95,8 +95,8 @@ int main(int argc, char** argv)
 	
     //yolov3.load_param("yolov3-tiny.param");
     //yolov3.load_model("yolov3-tiny.weights");
-	yolov3.ncnn_param("V10000.param");
-    yolov3.load_model("v7200.bin");
+	yolov3.ncnn_param("alexnet.param");
+    yolov3.load_model("alexnet.bin");
 
 	//LOG(INFO) << yolov3._NH << " " << yolov3._NW << " " << yolov3._NC;
 

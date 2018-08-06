@@ -11,6 +11,13 @@ void InputLayer::SetUp(Tensor& Input, Tensor& Output)
 	Output[0]->Reshape(YC, YH, YW);
 }
 
+void InputLayer::L2Net(Net *net)
+{
+	net->_NH = YH;
+	net->_NW = YW;
+	net->_NC = YC;
+}
+
 void InputLayer::Run(Tensor& Input, Tensor& Output)
 {
 	//
