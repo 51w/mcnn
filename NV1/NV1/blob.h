@@ -57,6 +57,18 @@ public:
 	inline int num_axes() const { return shape_.size(); }
 	inline int count() const { return count_; }
 
+	
+	inline int count(int start_axis, int end_axis) const 
+	{
+		int count = 1;
+		for (int i = start_axis; i < end_axis; ++i) {
+		  count *= shape(i);
+		}
+		return count;
+	}
+	inline int count(int start_axis) const {
+		return count(start_axis, num_axes());
+	}
 
 	inline int CanonicalAxisIndex(int axis_index) const 
 	{

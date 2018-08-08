@@ -19,7 +19,6 @@ public:
 	// 返回Layer类型
 	virtual inline const char* type() const { return "";}
 	
-	
 	void xSetUp(Tensor& Input, Tensor& Output, Net *net){
 		SetUp(Input, Output);
 		L2Net(net);
@@ -29,6 +28,16 @@ public:
 	virtual void SetUp(Tensor& Input, Tensor& Output){}
 	
 	virtual void Run(Tensor& Input, Tensor& Output) = 0;
+	
+	
+	int GetParam_Int32(int id, int val)
+	{
+		return layer_param_.size()>id ? stoi(layer_param_[id]) : val;
+	}	
+	float GetParam_f32(int id, float val)
+	{
+		return layer_param_.size()>id ? stof(layer_param_[id]) : val;
+	}
 	
 public:
 	vector<string> layer_param_; // 输入参数

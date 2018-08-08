@@ -202,6 +202,36 @@ int Net::Yolo_model(FILE* fp)
 	return ret;
 }
 
+int Net::ncnn_model(FILE* binfp)
+{
+	int nread;
+	
+	int num_source_layers = layers_.size();
+	for (int i = 0; i < num_source_layers; ++i) 
+	{
+		string layer_type = layers_[i]->type();
+		LOG(INFO) << layer_type << " " << layers_[i]->blobs_.size();
+		
+		if(layer_type == "Convolution" || layer_type == "ConvolutionDepthWise" || layer_type == "InnerProduct")
+		{
+			int flag_struct = 0;
+			nread = fread(&flag_struct, sizeof(flag_struct), 1, binfp);
+			CHECK(nread == 1);
+			LOG(INFO) << "Flag_struct: " << flag_struct;
+			
+			for (int j=0; j<layers_[i]->blobs_.size(); ++j) 
+			{
+				LOG(INFO) << layers_[i]->blobs_[j]->count();
+				int count = layers_[i]->blobs_[j]->count();
+				float *data = layers_[i]->blobs_[j]->mutable_cpu_data();
+				
+				nread = fread(data, count * sizeof(float), 1, binfp);
+				CHECK(nread == 1);
+			}
+		}
+	}
+}
+
 int Net::load_model(const char* modelpath)
 {
 	FILE* fp = fopen(modelpath, "rb");
@@ -211,7 +241,8 @@ int Net::load_model(const char* modelpath)
 		return -1;
 	}
 	
-	int ret = Yolo_model(fp);
+	//int ret = Yolo_model(fp);
+	int ret = ncnn_model(fp);
 	fclose(fp);
 
 	return ret;

@@ -19,6 +19,7 @@ public:
 	int number_param();
   
 	int Yolo_model(FILE* fp);
+	int ncnn_model(FILE* fp);
 	int load_model(const char* modelpath);
   
 	void SetParam(string paramstr);
@@ -33,7 +34,7 @@ public:
 	vector<Blob*> net_input_blobs_;
 	vector<Blob*> net_output_blobs_;	
 
-protected:	
+//protected:	
 	vector<shared_ptr<Layer> > layers_;
 	vector<shared_ptr<Blob> > blobs_;
 
