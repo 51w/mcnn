@@ -1,3 +1,4 @@
 *.weights
 *.bin
 *.caffemodel
+*.txt
