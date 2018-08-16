@@ -13,7 +13,7 @@ class Net
 {
 public:
 	Net( ){}; //init
-	~Net(){};
+	~Net();
 	
 	int ncnn_param(const char* protopath);
 	int number_param();
@@ -33,15 +33,16 @@ public:
 	
 	vector<Blob*> net_input_blobs_;
 	vector<Blob*> net_output_blobs_;	
-
-//protected:	
-	vector<shared_ptr<Layer> > layers_;
-	vector<shared_ptr<Blob> > blobs_;
-
 	vector<vector<Blob*> > bottom_vecs_;
 	vector<vector<Blob*> > top_vecs_;
+	
+//protected:
+	vector<shared_ptr<Blob> > blobs_;
+	vector<shared_ptr<Layer> > layers_;
+	
 	vector<vector<string>> _param;
 	vector<string> layer_names_;
+	vector<string> blob_names_;
 };
 
 }

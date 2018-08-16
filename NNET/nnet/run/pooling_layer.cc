@@ -35,7 +35,15 @@ void PoolingLayer::SetUp(Tensor& Input, Tensor& Output)
 
 void PoolingLayer::Run(Tensor& Input, Tensor& Output)
 {
-	LOG(INFO) << "PooL: " << YC << " " << YH << " " << YW;
+	// FILE* pp1 = fopen("Pool0.txt", "wb");
+	// float *out1 = Input[0]->mutable_cpu_data();
+	// for (int j=0; j < Input[0]->count(); j++)
+		// fprintf(pp1, "%f  -- Pool0\n", out1[j]);
+	// fclose(pp1);
+	
+	
+	LOG(INFO) << "PooL: XX " << XC << " " << XH << " " << XW;
+	LOG(INFO) << "PooL: YY " << YC << " " << YH << " " << YW;
 	
 	const float* bottom_data = Input[0]->cpu_data();
 	float* top_data = Output[0]->mutable_cpu_data();
@@ -69,7 +77,7 @@ void PoolingLayer::Run(Tensor& Input, Tensor& Output)
                 {
 					sum += bottom_data[i];
                 }
-				top_data[c] = sum;
+				top_data[c] = sum / size;
 				
 				bottom_data += size;
 			}
@@ -160,6 +168,14 @@ void PoolingLayer::Run(Tensor& Input, Tensor& Output)
 	}
 	
 	}
+	
+	
+	
+	// FILE* pp2 = fopen("Pool1.txt", "wb");
+	// float *out2 = Output[0]->mutable_cpu_data();
+	// for (int j=0; j < Output[0]->count(); j++)
+		// fprintf(pp2, "%f  -- Pool1\n", out2[j]);
+	// fclose(pp2);
 }
 
 }

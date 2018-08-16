@@ -27,8 +27,9 @@ void ConvolutionLayer::SetUp(Tensor& Input, Tensor& Output)
 	YC = num_output;
 	
 	Output[0]->Reshape(YC, YH, YW);
-	_im2col.Reshape(XW*XH* XC * kernel*kernel);
-	//LOG(INFO) << "Conv: " << YC << " " << YW << " " << YH;
+	_im2col.Reshape(XW*XH* XC * kernel*kernel*2);  //BUG//BUG//BUG//BUG//BUG//BUG//BUG
+	LOG(INFO) << "Conv: XX " << XC << " " << XW << " " << XH;
+	LOG(INFO) << "Conv: YY " << YC << " " << YW << " " << YH;
 	
 	if(bias_term) {
       this->blobs_.resize(2);

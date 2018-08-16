@@ -15,7 +15,7 @@ class Layer
 public:
 	// 初始化layer_param_
 	explicit Layer(const vector<string>& param) : layer_param_(param) {}		 
-	virtual ~Layer() {}
+	//virtual ~Layer() {LOG(INFO) << "layer";}
 	
 	// 返回Layer类型
 	virtual inline const char* type() const { return "";}

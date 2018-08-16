@@ -30,6 +30,8 @@ void SoftmaxLayer::SetUp(Tensor& Input, Tensor& Output)
 	YC = Input[0]->CC();
 	
 	Output[0]->Reshape(YC, YH, YW);
+	LOG(INFO) << "Softmax: " << outer_num_ << " " << inner_num_;
+	LOG(INFO) << YC << " " << YH << " " << YW;
 }
 
 void SoftmaxLayer::Run(Tensor& Input, Tensor& Output)

@@ -1,6 +1,19 @@
 #include "nnet/net.h"
 namespace NNET{
 
+Net::~Net()
+{
+	LOG(INFO) << "Net <--> Free";
+	net_input_blobs_.clear();
+	net_output_blobs_.clear();
+	
+	bottom_vecs_.clear();
+    top_vecs_.clear();
+	
+	blobs_.clear();
+	layers_.clear();
+}
+
 int Net::ncnn_param(const char* protopath)
 {
 	FILE* fp = fopen(protopath, "rb");
@@ -60,6 +73,8 @@ int Net::ncnn_param(const char* protopath)
 			CHECK(blob_name_to_idx.find(blob_name) == blob_name_to_idx.end())
 				<< blob_name << " produced by multiple sources.";
 
+			blob_names_.push_back(string(blob_name));
+				
 			// Normal output.
 			shared_ptr<Blob> blob_pointer(new Blob());
 			const int blob_id = blobs_.size();
@@ -222,11 +237,11 @@ int Net::ncnn_model(FILE* binfp)
 			int flag_struct = 0;
 			nread = fread(&flag_struct, sizeof(flag_struct), 1, binfp);
 			CHECK(nread == 1);
-			LOG(INFO) << "Flag_struct: " << flag_struct;
+			//LOG(INFO) << "Flag_struct: " << flag_struct;
 			
 			for (int j=0; j<layers_[i]->blobs_.size(); ++j) 
 			{
-				LOG(INFO) << layers_[i]->blobs_[j]->count();
+				//LOG(INFO) << layers_[i]->blobs_[j]->count();
 				
 				int count = layers_[i]->blobs_[j]->count();
 				float *data = layers_[i]->blobs_[j]->mutable_cpu_data();
@@ -307,8 +322,11 @@ void Net::Run()
 	// 前向网络 <--> 预测
 	for (int i = 0; i < layers_.size(); ++i)
 	{
-		shared_ptr<Blob> aa = blobs_[i];
-		LOG(INFO) << layer_names_[i] << " " << aa->CC() << " " << aa->HH() << " " << aa->WW();
+		//shared_ptr<Blob> aa = blobs_[i];
+		//LOG(INFO) << layer_names_[i] << " " << aa->CC() << " " << aa->HH() << " " << aa->WW();
+		
+		//LOG(INFO) << layer_names_[i] << " " << top_vecs_[i][0]->CC() * top_vecs_[i][0]->HH() * top_vecs_[i][0]->WW() <<
+		//	" " << top_vecs_[i][0]->CC() << " " << top_vecs_[i][0]->HH() << " " << top_vecs_[i][0]->WW();
 		
 		layers_[i]->Run(bottom_vecs_[i], top_vecs_[i]);
 	}

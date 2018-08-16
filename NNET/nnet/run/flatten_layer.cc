@@ -23,12 +23,9 @@ void FlattenLayer::Run(Tensor& Input, Tensor& Output)
 	
 	for(int q=0; q<XC; q++)
     {
-		dst += q*size;
-		src += q*size;
-		
         for(int i=0; i<size; i++)
         {
-            dst[i] = src[i];
+            dst[q*size + i] = src[q*size + i];
         }
     }
 }

@@ -31,6 +31,7 @@ public:
 	Blob()
 		: data_(), count_(0), capacity_(0) {}
 	explicit Blob(const int channels, const int height = 1, const int width = 1);
+	//~Blob() {LOG(INFO) << count_ << "aaa";}
 	
 	explicit Blob(const vector<int>& shape);
 

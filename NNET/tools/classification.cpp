@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -42,6 +43,13 @@ int main(int argc, char** argv)
 	LOG(INFO) << yolov3._NH << " " << yolov3._NW << " " << yolov3._NC;
 	
 	
+	vector<string> labels_;
+	std::ifstream labels("synset_words.txt");
+	//labels.open("synset_words.txt");
+	CHECK(labels) << "Unable to open labels file synset_words.txt";
+	string line;
+	while(std::getline(labels, line))
+	labels_.push_back(string(line));
 	//**********************************//
 	cv::Mat img = cv::imread(argv[3]);
 	if (img.empty())
@@ -81,11 +89,17 @@ int main(int argc, char** argv)
 	cv::subtract(sample_float, mean_, sample_normalized);
 	cv::split(sample_normalized, input_channels);
 	
-	//**********************************//
-	LOG(INFO) << "Blob_SIZE: " << yolov3.blobs_.size();
-	
+	//**********************************//	
 	yolov3.Run();
+	
 
+	// LOG(INFO) << "Blob_SIZE: " << yolov3.blobs_.size();
+	// for (int i=0; i < yolov3.blobs_.size(); i++)
+	// {
+		// shared_ptr<NNET::Blob> aa = yolov3.blobs_[i];
+		// LOG(INFO) << yolov3.blob_names_[i] << "  SIZE: " << aa->count();
+	// }
+	
 /*
 	for (int i=0; i < yolov3.blobs_.size(); i++)
 	//for (int i=0; i < 10; i++)
@@ -119,12 +133,12 @@ int main(int argc, char** argv)
 
 	for (int i = 0; i < maxN.size(); ++i)
 	{
-		LOG(INFO) << ">>" << maxN[i] << "  <-->  " << output[maxN[i]]; 
+		LOG(INFO) << ">>" << maxN[i] << "  <-->  " << output[maxN[i]] << "  <-->  " << labels_[maxN[i]]; 
 	}
 	
 	
 	//
 	cv::imshow("result",img);
-	cv::waitKey(30);
+	cv::waitKey();
 	return 0;
 }

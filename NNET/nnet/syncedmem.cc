@@ -14,7 +14,7 @@ SyncedMemory::SyncedMemory(size_t size)
 
 SyncedMemory::~SyncedMemory() 
 {
-	if (cpu_ptr_ && own_cpu_data_)
+	if(cpu_ptr_ && own_cpu_data_)
 	{  CaffeFreeHost(cpu_ptr_); }
 }
 

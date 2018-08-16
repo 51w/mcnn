@@ -7,6 +7,10 @@ namespace NNET
 void ConcatLayer::SetUp(Tensor& Input, Tensor& Output) 
 {
 	LOG(INFO) << "1111111111";
+	for(int i = 0; i < Input.size(); ++i)
+	{
+		LOG(INFO) << Input[i]->CC() << " " << Input[i]->HH() << " " << Input[i]->WW() << " " << Input[i]->count();
+	}
 	
 	concat_axis_ = GetParam_Int32(0, 0);
 	
@@ -36,6 +40,7 @@ void ConcatLayer::SetUp(Tensor& Input, Tensor& Output)
 	{ Output[0]->ShareData(*Input[0]); }
 
 	LOG(INFO) << "22222222222";
+	LOG(INFO) << "Output " << Output[0]->CC() << " " << Output[0]->HH() << " " << Output[0]->WW() << " " << Output[0]->count();
 }
 
 void ConcatLayer::Run(Tensor& Input, Tensor& Output)
