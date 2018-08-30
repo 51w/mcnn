@@ -12,8 +12,10 @@ void LRNLayer::SetUp(Tensor& Input, Tensor& Output)
     beta  = GetParam_f32(3, 0.75f);
     bias  = GetParam_f32(4, 1.f);
 	CHECK(region_type == 0) << "LRN only support ACROSS_CHANNELS";
-	//LOG(INFO) << "LRN: " << region_type << " " << local_size << " " << alpha << " " << beta << " " << bias;
+}
 
+void LRNLayer::Reshape(Tensor& Input, Tensor& Output)
+{
 	XC = Input[0]->CC();
 	XH = Input[0]->HH();
 	XW = Input[0]->WW();
@@ -26,13 +28,11 @@ void LRNLayer::SetUp(Tensor& Input, Tensor& Output)
 		Output[0]->Reshape(YC, YH, YW);
 		square_blob.Reshape(YC, YH, YW);
 		square_sum.Reshape(YC, YH, YW);
-		//LOG(INFO) << "LRN: " << YH << " " << YW << " " << YC;
 	}
 }
 
 void LRNLayer::Run(Tensor& Input, Tensor& Output)
 {
-	//LOG(INFO) << "LRN: " << YC << " " << YH << " " << YW;
 	float* dst = Output[0]->mutable_cpu_data();
 	float* src = Input[0]->mutable_cpu_data();
 	
@@ -46,37 +46,40 @@ void LRNLayer::Run(Tensor& Input, Tensor& Output)
 	}
 	
 	if(region_type == NormRegion_ACROSS_CHANNELS)
-    {
-		for(int i=0; i<count; i++){
-			psum[i] = 0.f;
-		}
+	{
+		for(int i=0; i<count; i++)
+		{	psum[i] = 0.f;  }
 		
 		const float alpha_div_size = alpha / local_size;
 
 		for(int q=0; q<YC; q++)
-        {
-            // square sum
-            float* ssptr = psum + q*YW*YH;
-            for(int p=q - local_size / 2; p<=q + local_size / 2; p++)
-            {
-                if(p < 0 || p >= YC)
-                    continue;
+		{
+			// square sum
+			float* ssptr = psum + q*YW*YH;
+			for(int p=q - local_size / 2; p<=q + local_size / 2; p++)
+			{
+				if(p < 0 || p >= YC)
+					continue;
 
-                const float* sptr = psqr + p*YW*YH;
-                for(int i=0; i<YW*YH; i++)
-                {
-                    ssptr[i] += sptr[i];
-                }
-            }
+				const float* sptr = psqr + p*YW*YH;
+				for(int i=0; i<YW*YH; i++)
+				{
+					ssptr[i] += sptr[i];
+				}
+			}
 
-            float* ptrI = src + q*YW*YH;
+			float* ptrI = src + q*YW*YH;
 			float* ptrO = dst + q*YW*YH;
-            for(int i=0; i<YW*YH; i++)
-            {
-                ptrO[i] = ptrI[i] * pow(bias + alpha_div_size * ssptr[i], -beta);
-            }
-        }
+			for(int i=0; i<YW*YH; i++)
+			{
+				ptrO[i] = ptrI[i] * pow(bias + alpha_div_size * ssptr[i], -beta);
+			}
+		}
+	}
+	else if (region_type == NormRegion_WITHIN_CHANNEL)
+    {
+		
 	}
 }
 
-}
+} // NNET

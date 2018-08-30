@@ -20,6 +20,7 @@ protected:
 	int  weight_data_size;
 	
 	Blob _im2col;
+	Blob blob_bordered;
 
 	int XC, YC;
 	int XH, YH;

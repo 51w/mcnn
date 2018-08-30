@@ -41,6 +41,11 @@ void ConvolutionDepthWiseLayer::SetUp(Tensor& Input, Tensor& Output)
 	this->blobs_[0].reset(new Blob(Input[0]->CC() *kernel*kernel* num_output/group));
 }
 
+void ConvolutionDepthWiseLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	
+}
+
 float im2col_get_pixelDW(float *im, int height, int width, int channels,
                         int row, int col, int channel, int pad)
 {

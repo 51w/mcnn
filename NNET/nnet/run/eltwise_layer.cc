@@ -11,13 +11,16 @@ void EltwiseLayer::SetUp(Tensor& Input, Tensor& Output)
 	CHECK(coeff_size == 0) << "Eltwise coeff no use.";
 	
 	coeffs = vector<float>(Input.size(), 1);
-	
 	for(int i=0; i<Input.size(); i++)
 	CHECK(Input[0]->shape() == Input[i]->shape());
-	
+}
+
+void EltwiseLayer::Reshape(Tensor& Input, Tensor& Output)
+{
 	XC = Input[0]->CC();
 	XH = Input[0]->HH();
 	XW = Input[0]->WW();
+	
 	YH = XH;
 	YW = XW;
 	YC = XC;

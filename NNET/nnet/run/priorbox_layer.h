@@ -24,9 +24,10 @@ protected:
     float step_height;
     float offset;
 
-	int XC, YC;
-	int XH, YH;
-	int XW, YW;
+	int num_prior;
+	int X1C, X0C;
+	int X1H, X0H;
+	int X1W, X0W;
 };
 
 REGISTER_LAYER_CLASS(PriorBox);

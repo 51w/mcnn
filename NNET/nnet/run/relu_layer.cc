@@ -6,13 +6,13 @@ namespace NNET
 void ReLULayer::SetUp(Tensor& Input, Tensor& Output) 
 {
 	slope = GetParam_f32(0, 0.f);
-	
-	XC = Input[0]->CC();
-	XH = Input[0]->HH();
-	XW = Input[0]->WW();
-	YH = XH;
-	YW = XW;
-	YC = XC;
+}
+
+void ReLULayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	XC = Input[0]->CC();  YC = XC;
+	XH = Input[0]->HH();  YH = XH;
+	XW = Input[0]->WW();  YW = XW;
 	
 	Output[0]->Reshape(YC, YH, YW);
 	//Output[0]->ShareData(*Input[0]);
@@ -20,7 +20,6 @@ void ReLULayer::SetUp(Tensor& Input, Tensor& Output)
 
 void ReLULayer::Run(Tensor& Input, Tensor& Output)
 {
-	//LOG(INFO) << "ReLU: " << YC << " " << YH << " " << YW;
 	float* dst = Output[0]->mutable_cpu_data();
 	const float* src = Input[0]->cpu_data();
 	

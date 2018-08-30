@@ -22,7 +22,7 @@ public:
 	int ncnn_model(FILE* fp);
 	int load_model(const char* modelpath, int type = 0);
   
-	void SetParam(string paramstr);
+	void SetParam(string paramstr, int layer_id);
 	
 	void Run(); //compute
 

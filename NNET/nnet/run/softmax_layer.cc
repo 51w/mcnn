@@ -13,7 +13,6 @@ void SoftmaxLayer::SetUp(Tensor& Input, Tensor& Output)
 	axis = GetParam_Int32(0, 0);
 	outer_num_ = Input[0]->count(0, axis);
 	inner_num_ = Input[0]->count(axis + 1);
-	//LOG(INFO) << "Softmax: " << axis;
 	
 	vector<int> mult_dims(1, Input[0]->shape(axis));
 	sum_multiplier_.Reshape(mult_dims);
@@ -34,6 +33,11 @@ void SoftmaxLayer::SetUp(Tensor& Input, Tensor& Output)
 	LOG(INFO) << YC << " " << YH << " " << YW;
 }
 
+void SoftmaxLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	
+}
+
 void SoftmaxLayer::Run(Tensor& Input, Tensor& Output)
 {
 	//LOG(INFO) << "SoftMax: " << YC << " " << YH << " " << YW;
@@ -48,7 +52,7 @@ void SoftmaxLayer::Run(Tensor& Input, Tensor& Output)
 	int count = Input[0]->count();
 	memcpy(dst, src, sizeof(float) * count);
 	
-	for (int i = 0; i < outer_num_; ++i)
+	for(int i = 0; i < outer_num_; ++i)
 	{
 		memcpy(scale_data, src + i * dim, sizeof(float) * inner_num_);
 		for (int j = 0; j < channels; j++) {

@@ -8,24 +8,28 @@ void InnerProductLayer::SetUp(Tensor& Input, Tensor& Output)
 	num_output = GetParam_Int32(0, 0);
     bias_term  = GetParam_Int32(1, 0);
     weight_data_size = GetParam_Int32(2, 0);
-	
-	//LOG(INFO) << "InnerProduct: " << num_output << " " << bias_term << " " << weight_data_size;
-	
+
 	XC = Input[0]->CC();
 	XH = Input[0]->HH();
 	XW = Input[0]->WW();
-	
 	Output[0]->Reshape(num_output);
 	
-	if (bias_term) {
-      this->blobs_.resize(2);
-    } else {
-      this->blobs_.resize(1);
+	if (bias_term)
+	{
+		this->blobs_.resize(2);
+		this->blobs_[0].reset(new Blob(XC*XH*XW * num_output));
+		this->blobs_[1].reset(new Blob(num_output));
     }
-	this->blobs_[0].reset(new Blob(XC*XH*XW * num_output));
-	this->blobs_[1].reset(new Blob(num_output));
-	
-	LOG(INFO) << "InnerProduct: " << XC << " " << XH << " " << XW;
+	else
+	{
+		this->blobs_.resize(1);
+		this->blobs_[0].reset(new Blob(XC*XH*XW * num_output));
+    }
+}
+
+void InnerProductLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	// No Support
 }
 
 void InnerProductLayer::Run(Tensor& Input, Tensor& Output)

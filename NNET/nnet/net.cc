@@ -89,9 +89,9 @@ int Net::ncnn_param(const char* protopath)
 		char param[300];
 		fgets(param, 300, fp);
 		string paramstr = param;
-		SetParam(paramstr);
+		SetParam(paramstr, layer_id);
 		
-		//LOG(INFO) << layer_name << " " << layer_type;
+		// LOG(INFO) << layer_name << "   [[" << paramstr << "]]";
 		// Layers create
 		layer_names_.push_back(layer_name);
 		layers_.push_back(LayerRegistry::CreateLayer(layer_name, layer_type, _param[layer_id]));
@@ -287,34 +287,43 @@ int Net::load_model(const char* modelpath, int type)
 	return ret;
 }
 
-void Net::SetParam(string paramstr)
+void Net::SetParam(string paramstr, int layer_id)
 {
 	int npos = 0;
 	vector<string> setparam;
 	
-	for(int i=0; i<30; i++){
-		
-	int s_index = paramstr.find('=', npos);
-	npos = s_index;
-	if(s_index >= 0)
-	{
-		int e_index = paramstr.find(' ', npos);
-		npos = e_index;
-		if(e_index >= 0)
+	for(int i=0; i<20; i++)
+	{	
+		int s_index = paramstr.find('=', npos);
+		if(s_index > 0)
 		{
-			string name = paramstr.substr(s_index+1, e_index-1-s_index);
-			setparam.push_back(name);
+			npos = s_index+1;
+
+			int e_index = paramstr.find(' ', npos);
+			if(e_index > 0)
+			{
+				npos = e_index;
+				string name = paramstr.substr(s_index+1, e_index-1-s_index);
+				setparam.push_back(name);
+			}
+			else
+			{
+				string name = paramstr.substr(s_index+1, paramstr.size()-1-s_index);
+				setparam.push_back(name);
+			}
 		}
-		else
-		{
-			string name = paramstr.substr(s_index+1, paramstr.size()-2-s_index);
-			setparam.push_back(name);
-		}
-	}
-	else  break;
-	
+		else  break;
 	}
 	_param.push_back(setparam);
+	setparam.clear();
+
+#if 0	
+	std::cout << "[" << layer_id << "]" << std::endl;
+	for(int i=0; i<_param[layer_id].size(); i++)
+	std::cout << _param[layer_id][i] << " ";
+	std::cout << std::endl;
+#endif
+
 }
 
 void Net::Run() 

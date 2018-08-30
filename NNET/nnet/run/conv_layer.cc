@@ -28,8 +28,8 @@ void ConvolutionLayer::SetUp(Tensor& Input, Tensor& Output)
 	
 	Output[0]->Reshape(YC, YH, YW);
 	_im2col.Reshape(XW*XH* XC * kernel*kernel*2);  //BUG//BUG//BUG//BUG//BUG//BUG//BUG
-	LOG(INFO) << "Conv: XX " << XC << " " << XW << " " << XH;
-	LOG(INFO) << "Conv: YY " << YC << " " << YW << " " << YH;
+	//LOG(INFO) << "Conv: XX " << XC << " " << XW << " " << XH;
+	//LOG(INFO) << "Conv: YY " << YC << " " << YW << " " << YH;
 	
 	if(bias_term) {
       this->blobs_.resize(2);
@@ -39,6 +39,11 @@ void ConvolutionLayer::SetUp(Tensor& Input, Tensor& Output)
     }
 	
 	this->blobs_[0].reset(new Blob(Input[0]->CC() *kernel*kernel* num_output));
+}
+
+void ConvolutionLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	
 }
 
 float im2col_get_pixel(float *im, int height, int width, int channels,
@@ -89,8 +94,98 @@ void gemm(int TA, int TB, int M, int N, int K, float ALPHA,
 
 void ConvolutionLayer::Run(Tensor& Input, Tensor& Output)
 {
-	//LOG(INFO) << "Convolution: " << YC << " " << YH << " " << YW;
+	// LOG(INFO) << "Convolution: " << YC << " " << YH << " " << YW;
+	// float *aaa = Input[0]->mutable_cpu_data();
+	// FILE* pp1 = fopen("conv1.txt", "wb");
+	// for(int i=0; i<Input[0]->count(); i++)
+		// fprintf(pp1, "%f  -- conv1\n", aaa[i]);
+	// fclose(pp1);
+#if 0
+	if(pad > 0)
+	{
+		int newh = XH + 2*pad;
+		int neww = XW + 2*pad;
+		blob_bordered.Reshape(XC, newh, neww);
+		
+		Dtype* data = blob_bordered.mutable_cpu_data();
+		Dtype* bottom_blob = Input[0]->mutable_cpu_data();
+		
+		for (int q = 0; q < XC; q++)
+		{
+			for (int i = 0; i < newh; i++)
+			{
+				for (int j = 0; j < neww; j++)
+				{
+					if(i < pad || i > newh-pad-1 || j < pad || j > neww-pad-1)
+						data[q*neww*newh + i*neww + j] = 0.0f;
+					else
+						data[q*neww*newh + i*neww + j] = \
+					bottom_blob[q*XW*XH + (i-pad)*XW + j-pad];
+				}
+			}
+		}
+	}
+	else
+	{
+		blob_bordered.ReshapeLike(*Input[0]);
+		blob_bordered.ShareData(*Input[0]);
+	}
+	LOG(INFO) << "Conv: YY " << YC << " " << YW << " " << YH;
 	
+	const float* inptr = blob_bordered.cpu_data();
+	float* outptr = Output[0]->mutable_cpu_data();
+	
+	const int maxk = kernel * kernel;	
+	int space_ofs[maxk];
+	{
+		int p1 = 0;
+		int p2 = 0;
+		int gap = blob_bordered.WW() - kernel;
+		for (int i = 0; i < kernel; i++)
+		{
+			for (int j = 0; j < kernel; j++)
+			{
+				space_ofs[p1] = p2;
+				p1++;
+				p2++;
+			}
+			p2 += gap;
+		}
+	}
+	
+	float *_weights = this->blobs_[0]->mutable_cpu_data();
+	for (int p=0; p<YC; p++)
+    {
+        for (int i = 0; i < YH; i++)
+        {
+            for (int j = 0; j < YW; j++)
+            {
+                float sum = 0.f;
+
+                const float* kptr = _weights + maxk * XC * p;
+
+                for (int q=0; q<XC; q++)
+                {
+					const float* aaa = inptr + q * blob_bordered.offset(1);
+                    const float* sptr = aaa + (i*stride*blob_bordered.WW()) + j*stride;
+
+                    for (int k = 0; k < maxk; k++) // 29.23
+                    {
+                        float val = sptr[ space_ofs[k] ]; // 20.72
+                        float weight = kptr[k];
+                        sum += val * weight; // 41.45
+                    }
+
+                    kptr += maxk;
+                }
+
+				int conv_index = i * YW + j;
+				outptr[conv_index] = sum;
+            }
+        }
+        outptr += Output[0]->offset(1);
+    }		
+#else	
 	float *inptr = Input[0]->mutable_cpu_data();
 	float *_weights = this->blobs_[0]->mutable_cpu_data();
 	float *outptr   = Output[0]->mutable_cpu_data();
@@ -109,6 +204,7 @@ void ConvolutionLayer::Run(Tensor& Input, Tensor& Output)
 
 	im2col_cpu(inptr, XC, XH, XW, kernel, stride, pad, b);
 	gemm(0,0,m,n,k,1,a,k,b,n,1,c,n);
+#endif
 	
 	if(bias_term) 
 	{
@@ -125,6 +221,13 @@ void ConvolutionLayer::Run(Tensor& Input, Tensor& Output)
 			}
 		}
 	}
+	
+	// float *bbb = Output[0]->mutable_cpu_data();
+	// FILE* pp2 = fopen("conv2.txt", "wb");
+	// for(int i=0; i<Output[0]->count(); i++)
+		// fprintf(pp2, "%f  -- conv2\n", bbb[i]);
+	// fclose(pp2);
+	// LOG(FATAL) << "CONV1";
 }
 
 }

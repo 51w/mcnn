@@ -6,27 +6,29 @@ namespace NNET
 
 void ScaleLayer::SetUp(Tensor& Input, Tensor& Output) 
 {
-	scale_data_size = GetParam_Int32(0, 0);
-    bias_term = GetParam_Int32(1, 0);
+	scale_size = GetParam_Int32(0, 0);
+    bias_term  = GetParam_Int32(1, 0);
 	
-	XC = Input[0]->CC();
-	XH = Input[0]->HH();
-	XW = Input[0]->WW();
-	YH = XH;
-	YW = XW;
-	YC = XC;
+	if(bias_term)
+	{
+		this->blobs_.resize(2);
+		this->blobs_[1].reset(new Blob(scale_size));
+		this->blobs_[0].reset(new Blob(scale_size));
+	}else
+	{
+		this->blobs_.resize(1);
+		this->blobs_[0].reset(new Blob(scale_size));
+	}
+}
+
+void ScaleLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	XC = Input[0]->CC();  YC = XC;
+	XH = Input[0]->HH();  YH = XH;
+	XW = Input[0]->WW();  YW = XW;
 	
 	Output[0]->Reshape(YC, YH, YW);
 	Output[0]->ShareData(*Input[0]);
-	
-	CHECK(scale_data_size == YC) << "ScaleLayer -233";
-	if(bias_term){
-		this->blobs_.resize(2);
-		this->blobs_[1].reset(new Blob(scale_data_size));
-	}else{
-		this->blobs_.resize(1);
-	}
-	this->blobs_[0].reset(new Blob(scale_data_size));
 }
 
 void ScaleLayer::Run(Tensor& Input, Tensor& Output)

@@ -6,30 +6,30 @@ namespace NNET
 
 void DropoutLayer::SetUp(Tensor& Input, Tensor& Output) 
 {
-	//scale = this->layer_param_.size()>0 ? stof(this->layer_param_[0]) : 1.f;
 	scale = GetParam_f32(0, 1.f);
-	
-	XC = Input[0]->CC();
-	XH = Input[0]->HH();
-	XW = Input[0]->WW();
-	YH = XH;
-	YW = XW;
-	YC = XC;
+}
+
+void DropoutLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	XC = Input[0]->CC();  YC = XC;
+	XH = Input[0]->HH();  YH = XH;
+	XW = Input[0]->WW();  YW = XW;
 	
 	Output[0]->Reshape(YC, YH, YW);
-	
-	//LOG(INFO) << "DropoutLayer scale[1.f]: " << scale;
+	Output[0]->ShareData(*Input[0]);
 }
 
 void DropoutLayer::Run(Tensor& Input, Tensor& Output)
 {
-	LOG(INFO) << "DropOUT: " << YC << " " << YH << " " << YW;
-	
-	float* dst = Output[0]->mutable_cpu_data();
-	const float* src = Input[0]->cpu_data();
-	
-	int count = Input[0]->count();
-	memcpy(dst, src, sizeof(float) * count);
+	if(scale != 1.f)
+	{
+		float* dst = Output[0]->mutable_cpu_data();
+		int count  = Output[0]->count();
+		
+		for(int i=0; i<count; i++)
+		dst[i] = dst[i] * scale;
+	}
+	//memcpy(dst, src, sizeof(float) * count);
 }
 
 }

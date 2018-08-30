@@ -105,7 +105,8 @@ public:
 		: Layer(param) {} 								\
 	virtual inline const char* type() const 			\
 	{ return #name; } 									\
-	virtual void SetUp(Tensor& bottom, Tensor& top); 	\
-	virtual void  Run(Tensor& bottom, Tensor& top); 	\
- 
+	virtual void SetUp(Tensor& Input, Tensor& Output); 	\
+	virtual void  Run(Tensor& Input, Tensor& Output); 	\
+	virtual void Reshape(Tensor& Input, Tensor& Output);
+	
 }

@@ -18,8 +18,7 @@ protected:
 	int XC, YC;
 	int XH, YH;
 	int XW, YW;
-	
-	enum { Operation_PROD = 0, Operation_SUM = 1, Operation_MAX = 2 };
+	enum{ Operation_PROD = 0, Operation_SUM = 1, Operation_MAX = 2 };
 };
 
 REGISTER_LAYER_CLASS(Eltwise);

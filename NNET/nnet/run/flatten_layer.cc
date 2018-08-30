@@ -5,14 +5,17 @@ namespace NNET
 
 void FlattenLayer::SetUp(Tensor& Input, Tensor& Output) 
 {
+	
+}
+
+void FlattenLayer::Reshape(Tensor& Input, Tensor& Output)
+{
 	XC = Input[0]->CC();
 	XH = Input[0]->HH();
 	XW = Input[0]->WW();
-	YC = XC*XH*XW;
 	
+	YC = XC*XH*XW;
 	Output[0]->Reshape(YC);
-	LOG(INFO) << XC << " " << XH << " " << XW << " <--> "
-			<< Output[0]->CC() << " " << Output[0]->HH() << " " << Output[0]->WW();
 }
 
 void FlattenLayer::Run(Tensor& Input, Tensor& Output)

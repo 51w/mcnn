@@ -8,18 +8,7 @@ void BatchNormLayer::SetUp(Tensor& Input, Tensor& Output)
 {
 	channels = GetParam_Int32(0, 0);
     eps = GetParam_f32(1, 0.f);
-	CHECK(channels == Input[0]->CC());
-	
-	XC = Input[0]->CC();
-	XH = Input[0]->HH();
-	XW = Input[0]->WW();
-	
-	YH = XH;
-	YW = XW;
-	YC = XC;
-	
-	Output[0]->Reshape(YC, YH, YW);
-	Output[0]->ShareData(*Input[0]);
+	LOG(INFO) << channels << " " << eps;
 	
 	init = 0;
 	a_data.resize(channels);
@@ -32,10 +21,19 @@ void BatchNormLayer::SetUp(Tensor& Input, Tensor& Output)
 	this->blobs_[3].reset(new Blob(channels));
 }
 
+void BatchNormLayer::Reshape(Tensor& Input, Tensor& Output)
+{
+	XC = Input[0]->CC();  YC = XC;
+	XH = Input[0]->HH();  YH = XH;
+	XW = Input[0]->WW();  YW = XW;
+	
+	Output[0]->Reshape(YC, YH, YW);
+	Output[0]->ShareData(*Input[0]);
+}
+
 void BatchNormLayer::Run(Tensor& Input, Tensor& Output)
 {
 	float* dst = Output[0]->mutable_cpu_data();
-
 #if 1	
 	if(!init)
 	{
@@ -51,12 +49,6 @@ void BatchNormLayer::Run(Tensor& Input, Tensor& Output)
 			b_data[i] = slope_data[i] / sqrt_var;
 		}
 		init = 1;
-		
-		for(int q=0; q<channels; q++)
-		{
-			LOG(INFO) << mean_data[q] << " " << var_data[q] << "      "
-				<< slope_data[q] << " " << bias_data[q] << " " << eps;
-		}
 	}
 	
 	int size = YH*YW;
@@ -85,18 +77,6 @@ void BatchNormLayer::Run(Tensor& Input, Tensor& Output)
 		dst += size;
 	}
 #endif
-
-/*	
-	FILE* pp = fopen("000/1.txt", "wb");
-	Dtype* out = Output[0]->mutable_cpu_data();
-	int count  = Output[0]->count();
-	for(int i=0; i<count; i++)
-	{
-		fprintf(pp, "%f  -- bn\n", out[i]);	
-	}
-	fclose(pp);
-	LOG(FATAL) << "TXT.";
-*/
 }
 
 }

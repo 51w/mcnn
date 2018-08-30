@@ -87,7 +87,19 @@ int main(int argc, char** argv)
 	
 	cv::Mat sample_normalized;
 	cv::subtract(sample_float, mean_, sample_normalized);
-	cv::split(sample_normalized, input_channels);
+	
+	cv::Mat zz(inputH, inputW, CV_32FC3);
+	for(int i=0; i<inputH; i++)
+	{
+		for(int j=0; j<inputW; j++)
+		{
+			zz.at<Vec3f>(i,j)[0] = sample_normalized.at<Vec3f>(i,j)[0] * 0.017;
+			zz.at<Vec3f>(i,j)[1] = sample_normalized.at<Vec3f>(i,j)[1] * 0.017;
+			zz.at<Vec3f>(i,j)[2] = sample_normalized.at<Vec3f>(i,j)[2] * 0.017;
+		}
+	}
+
+	cv::split(zz, input_channels);
 	
 	//**********************************//	
 	yolov3.Run();
@@ -139,6 +151,6 @@ int main(int argc, char** argv)
 	
 	//
 	cv::imshow("result",img);
-	cv::waitKey(1000);
+	cv::waitKey();
 	return 0;
 }

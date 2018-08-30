@@ -10,24 +10,21 @@ namespace NNET
 // 3 = c w h
 // 4 = h c w
 // 5 = c h w
-
 void PermuteLayer::SetUp(Tensor& Input, Tensor& Output) 
 {
 	order_type = GetParam_Int32(0, 0);
-	LOG(INFO) << "Order Type: " << order_type;
-	
+	CHECK(order_type == 3);
+}
+
+void PermuteLayer::Reshape(Tensor& Input, Tensor& Output)
+{
 	XC = Input[0]->CC();
 	XH = Input[0]->HH();
 	XW = Input[0]->WW();
 	
-	CHECK(order_type == 3);
-	if(order_type == 3)
-	{
-		YH = XW;
-		YW = XC;
-		YC = XH;
-	}
-	
+	YH = XW;
+	YW = XC;
+	YC = XH;
 	Output[0]->Reshape(YC, YH, YW);
 }
 
@@ -36,18 +33,17 @@ void PermuteLayer::Run(Tensor& Input, Tensor& Output)
 	float* dst = Output[0]->mutable_cpu_data();
 	const float* src = Input[0]->cpu_data();
 	
-	if(order_type == 3){
-		for(int q=0; q<YC; q++)
+	for(int q=0; q<YC; q++)
+	{
+		for(int i=0; i<YH; i++)
 		{
-			for(int i=0; i<YH; i++){
 			for(int j=0; j<YW; j++)
 			{
 				const float* ptr = src + j*XW*XH + q*XW;
 				dst[i*YW + j] = ptr[i];
 			}
-			}
-			dst += YH*YW;
 		}
+		dst += YH*YW;
 	}
 }
 
