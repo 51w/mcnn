@@ -20,14 +20,14 @@ int main(int argc, char** argv)
 	net.load_model(argv[2]);
 	//Net<float> net(argv[1]);
 	//net.CopyTrainedLayersFrom(argv[2]);
-	Mat img = imread(argv[3]);
+	//Mat img = imread(argv[3]);
 	
-// VideoCapture cam(argv[3]);
-// Mat img;
+VideoCapture cam(argv[3]);
+Mat img;
 
-// while (1) {
-// cam >> img;
-// if (img.empty()) break;
+while (1) {
+cam >> img;
+if (img.empty()) break;
 
 
 	const float kScoreThreshold = 0.01f;
@@ -103,8 +103,8 @@ int main(int argc, char** argv)
 
 	//cv::imwrite("ssd-result.jpg", img);
 	cv::imshow("result", img);
-	cv::waitKey(0);
+	cv::waitKey(30);
 
-//}
+}
 	return 0;
 }

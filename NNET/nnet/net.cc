@@ -14,6 +14,11 @@ Net::~Net()
 	layers_.clear();
 }
 
+int Net::ncnn_param(string protopath)
+{
+	ncnn_param(protopath.c_str());
+}
+
 int Net::ncnn_param(const char* protopath)
 {
 	FILE* fp = fopen(protopath, "rb");
@@ -250,7 +255,7 @@ int Net::ncnn_model(FILE* binfp)
 				CHECK(nread == 1);
 			}
 		}
-		if(layer_type == "BatchNorm" || layer_type == "Scale")
+		if(layer_type == "BatchNorm" || layer_type == "Scale" || layer_type == "PReLU")
 		{
 			for (int j=0; j<layers_[i]->blobs_.size(); ++j) 
 			{
@@ -285,6 +290,11 @@ int Net::load_model(const char* modelpath, int type)
 	fclose(fp);
 
 	return ret;
+}
+
+int Net::load_model(string modelpath, int type)
+{
+	load_model(modelpath.c_str(), type);
 }
 
 void Net::SetParam(string paramstr, int layer_id)
@@ -324,6 +334,32 @@ void Net::SetParam(string paramstr, int layer_id)
 	std::cout << std::endl;
 #endif
 
+}
+
+void Param_vec(string ss, vector<float> &val)
+{
+	int npos = 0;
+	int index = ss.find(',', npos);
+	if(index != string::npos)
+	{
+		string name = ss.substr(0, index);
+		int num = stoi(name);
+		for(int i=0; i<num-1; i++)
+		{
+			npos = index+1;
+			index = ss.find(',', npos);
+			CHECK(index != string::npos);
+			name = ss.substr(npos, index);
+			val.push_back(stof(name));
+		}
+		name = ss.substr(index+1, ss.size());
+		val.push_back(stof(name));
+	}
+	else
+	{
+		int num = stoi(ss);
+		CHECK(num == 0);
+	}
 }
 
 void Net::Run() 

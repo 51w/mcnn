@@ -18,7 +18,6 @@ public:
 		return *g_registry_;
 	}
 	
-	
 	//*********************//
 	static void AddCreator(const string& type, Creator creator) 
 	{
@@ -31,15 +30,26 @@ public:
 		registry[type] = creator;
 	}
 	static shared_ptr<Layer> CreateLayer(const string& name, const string& type, const vector<string>& param) 
-	{	
+	{
+		string run_type = type;
+		if(run_type == "Reshape") run_type = "ReshapeLayer";
+		
+	#ifdef USE_NEON
+		run_type += "_NEON";
+	#elif  USE_CUDA
+		run_type += "_CUDA";
+	#elif  USE_OpenBLAS
+		run_type += "_OpenBLAS";
+	#endif
+	
 		CreatorRegistry& registry = Registry();
-		if(registry.count(type) != 1)
+		if(registry.count(run_type) != 1)
 		{
 			string typelist = LayerTypeListString();
-			fprintf(stderr, "\nUnknown layer type: %s\n(known types: %s )\n", type.c_str(), typelist.c_str());
+			fprintf(stderr, "\nUnknown layer type: %s\n(known types: %s )\n", run_type.c_str(), typelist.c_str());
 			exit(0);
 		}
-		return registry[type](param);
+		return registry[run_type](param);
 	}
 	//*********************//
 	
@@ -90,18 +100,18 @@ public:
 
  
 #define REGISTER_LAYER_CLASS(type)                                		 \
-	shared_ptr<Layer> Creator_##type##Layer(const vector<string>& param) \
+	shared_ptr<Layer> Creator_##type(const vector<string>& param) \
 	{                                                                  	 \
-		return shared_ptr<Layer>(new type##Layer(param));           	 \
+		return shared_ptr<Layer>(new type(param));           	 \
 	}                                                                  	 \
-	REGISTER_LAYER_CREATOR(type, Creator_##type##Layer)					 \
+	REGISTER_LAYER_CREATOR(type, Creator_##type)					 \
 
 
 #define Tensor const vector<Blob*> 
 
 // SetUp <--> Run  
 #define REGISTER_LAYER_INIT(name) 						\
-  	explicit name##Layer(const vector<string>& param) 	\
+  	explicit name(const vector<string>& param) 	\
 		: Layer(param) {} 								\
 	virtual inline const char* type() const 			\
 	{ return #name; } 									\

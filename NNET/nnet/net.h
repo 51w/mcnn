@@ -16,11 +16,13 @@ public:
 	~Net();
 	
 	int ncnn_param(const char* protopath);
+	int ncnn_param(string protopath);
 	int number_param();
   
 	int Yolo_model(FILE* fp);
 	int ncnn_model(FILE* fp);
 	int load_model(const char* modelpath, int type = 0);
+	int load_model(string modelpath, int type = 0);
   
 	void SetParam(string paramstr, int layer_id);
 	

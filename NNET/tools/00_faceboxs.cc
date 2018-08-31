@@ -78,6 +78,7 @@ if (img.empty()) break;
 	vector<BBox> detections;
 	for(int k = 0; k < num_det; ++k)
 	{
+		if(result_data[1] > kScoreThreshold) {
 		BBox bbox;
 		bbox.x1 = result_data[2] * width;
 		bbox.y1 = result_data[3] * height;
@@ -85,23 +86,21 @@ if (img.empty()) break;
 		bbox.y2 = result_data[5] * height;
 		bbox.score = result_data[1];
 		bbox.label = static_cast<int>(result_data[0]);
-		if(bbox.label >= 0) detections.push_back(bbox);
-
+		detections.push_back(bbox);
+	
+	    std::cout << bbox.label << " = " << bbox.score << " <--> " <<
+		bbox.x1 << " " << bbox.y1 << " " << bbox.x2-bbox.x1 << " " << bbox.y2-bbox.y1 << std::endl;
+		}
 		result_data += 6;
-		LOG(INFO) << bbox.label << " " << bbox.score;
-		LOG(INFO) << bbox.x1 << " " << bbox.y1 << " " << bbox.x2-bbox.x1 << " " << bbox.y2-bbox.y1;
 	}
 
 	//LOG(INFO) << result->count() << "   " << result->WW();
 	
 	// draw
-	for (auto& bbox : detections) 
+	for(auto& bbox : detections) 
 	{
 		cv::Rect rect(bbox.x1, bbox.y1, bbox.x2 - bbox.x1 + 1, bbox.y2 - bbox.y1 + 1);
 		cv::rectangle(img, rect, cv::Scalar(0, 0, 255), 2);
-		//char buff[300];
-		//sprintf(buff, "%s: %.2f", kClassNames[bbox.label], bbox.score);
-		//cv::putText(img, buff, cv::Point(bbox.x1, bbox.y1), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 0));
 	}
 
 	//cv::imwrite("faceboxs-result.jpg", img);

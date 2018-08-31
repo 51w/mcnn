@@ -8,6 +8,7 @@
 
 namespace NNET
 {
+void Param_vec(string ss, vector<float> &val);
 
 class Net;
 class Layer 
@@ -47,28 +48,7 @@ public:
 		CHECK(layer_param_.size() > id);
 		string ss = layer_param_[id];
 		
-		int npos = 0;
-		int index = ss.find(',', npos);
-		if(index != string::npos)
-		{
-			string name = ss.substr(0, index);
-			int num = stoi(name);
-			for(int i=0; i<num-1; i++)
-			{
-				npos = index+1;
-				index = ss.find(',', npos);
-				CHECK(index != string::npos);
-				name = ss.substr(npos, index);
-				val.push_back(stof(name));
-			}
-			name = ss.substr(index+1, ss.size());
-			val.push_back(stof(name));
-		}
-		else
-		{
-			int num = stoi(ss);
-			CHECK(num == 0);
-		}
+		Param_vec(ss, val);
 	}
 	
 public:
